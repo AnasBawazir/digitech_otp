@@ -1,50 +1,49 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:pin_code_fields/pin_code_fields.dart';
+import '../../size_config.dart';
+import '../../constants.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
-class SizeConfig {
-  static late MediaQueryData _mediaQueryData;
-  static late double screenWidth;
-  static late double screenHeight;
-  static double? defaultSize;
-  static Orientation? orientation;
-
-  void init(BuildContext context) {
-    _mediaQueryData = MediaQuery.of(context);
-    screenWidth = _mediaQueryData.size.width;
-    screenHeight = _mediaQueryData.size.height;
-    orientation = _mediaQueryData.orientation;
-  }
-}
-
-// Get the proportionate height as per screen size
-double getProportionateScreenHeight(double inputHeight) {
-  double screenHeight = SizeConfig.screenHeight;
-  // 812 is the layout height that designer use
-  return (inputHeight / 812.0) * screenHeight;
-}
-
-// Get the proportionate height as per screen size
-double getProportionateScreenWidth(double inputWidth) {
-  double screenWidth = SizeConfig.screenWidth;
-  // 375 is the layout width that designer use
-  return (inputWidth / 375.0) * screenWidth;
-}
 class OtpForm extends StatefulWidget {
-  const OtpForm({
-    Key? key,
-  }) : super(key: key);
+  final User user;
+  const OtpForm({Key? key,required this.user}) : super(key: key);
 
   @override
   _OtpFormState createState() => _OtpFormState();
 }
 
-class _OtpFormState extends State<OtpForm> {
+class _OtpFormState extends State<OtpForm> with TickerProviderStateMixin {
+  TextEditingController textEditingController = TextEditingController();
+
+
+  String currentText = "";
+  final formKey = GlobalKey<FormState>();
+  late Animation animation;
+  late AnimationController animationController;
+  FocusNode? pin1FocusNode;
   FocusNode? pin2FocusNode;
   FocusNode? pin3FocusNode;
   FocusNode? pin4FocusNode;
 
+  double size1= 0.0;
+  double size2= 0.0;
+  double size3= 0.0;
+  double size4= 0.0;
   @override
   void initState() {
+    animationController =
+        AnimationController(duration: Duration(milliseconds: 300), vsync: this);
+    CurvedAnimation curve =
+        CurvedAnimation(parent: animationController, curve: Curves.ease);
+
+    animation = Tween(begin: 0.0, end: 60.0).animate(curve)
+      ..addListener(() {
+        setState(() {});
+      });
     super.initState();
+    pin1FocusNode = FocusNode();
     pin2FocusNode = FocusNode();
     pin3FocusNode = FocusNode();
     pin4FocusNode = FocusNode();
@@ -52,33 +51,28 @@ class _OtpFormState extends State<OtpForm> {
 
   @override
   void dispose() {
+    animationController.dispose();
     super.dispose();
     pin2FocusNode!.dispose();
     pin3FocusNode!.dispose();
     pin4FocusNode!.dispose();
   }
 
-  void nextField(String value, FocusNode? focusNode) {
+  void nextField(
+      {required String value, FocusNode? focusNodeNext, FocusNode? focusNodeBack}) {
     if (value.length == 1) {
-      focusNode!.requestFocus();
+      focusNodeNext!.requestFocus();
     }
+    else if(value.length == 0){
+      focusNodeBack!.requestFocus();
+    }
+    animationController.forward();
+    animationController.addStatusListener((status) {
+      if (status == AnimationStatus.completed) {
+        animationController.reverse();
+      }
+    });
   }
-  final otpInputDecoration = InputDecoration(
-    contentPadding:
-    EdgeInsets.symmetric(vertical: getProportionateScreenWidth(15)),
-    border: OutlineInputBorder(
-      borderRadius: BorderRadius.circular(getProportionateScreenWidth(15)),
-      borderSide: BorderSide(color: Color(0xFF757575)),
-    ),
-    focusedBorder: OutlineInputBorder(
-      borderRadius: BorderRadius.circular(getProportionateScreenWidth(15)),
-      borderSide: BorderSide(color: Color(0xFF757575)),
-    ),
-    enabledBorder: OutlineInputBorder(
-      borderRadius: BorderRadius.circular(getProportionateScreenWidth(15)),
-      borderSide: BorderSide(color: Color(0xFF757575)),
-    ),
-  );
 
 
   @override
@@ -88,106 +82,158 @@ class _OtpFormState extends State<OtpForm> {
         children: [
           SizedBox(height: SizeConfig.screenHeight * 0.15),
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              SizedBox(
-                width: getProportionateScreenWidth(60),
-                child: TextFormField(
-                  autofocus: true,
-                  obscureText: true,
-                  style: TextStyle(fontSize: 24),
-                  keyboardType: TextInputType.number,
-                  textAlign: TextAlign.center,
-                  decoration: otpInputDecoration,
-                  onChanged: (value) {
-                    nextField(value, pin2FocusNode);
-                  },
-                ),
+              Stack(
+                alignment: AlignmentDirectional.center,
+                children: [
+                  Container(
+                    decoration: BoxDecoration(
+                      shape: BoxShape.rectangle,
+                    ),
+                    width: animation.value,
+                    height: animation.value,
+                    child: TextFormField(
+                      inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                      showCursor: false,
+                      focusNode: pin1FocusNode,
+                      autofocus: true,
+                      style: TextStyle(
+                          fontSize: 32,
+                          color: kPrimaryLightColor,
+                          fontWeight: FontWeight.w900),
+                      keyboardType: TextInputType.number,
+                      textAlign: TextAlign.center,
+                      decoration: otpInputDecoration,
+                      onChanged: (value) {
+                        nextField(value: value,focusNodeNext:  pin2FocusNode);
+                      },
+                    ),
+                  ),
+                  Container(
+                    height: animation.value > 0  ? 0.0 : 15.0,
+                    width: animation.value > 0 ? 0.0 : 15.0,
+                    decoration: BoxDecoration(
+                      color: lightColor,
+                      borderRadius: BorderRadius.all(Radius.circular(60)),
+                    ),
+                  ),
+                ],
               ),
-              SizedBox(
-                width: getProportionateScreenWidth(60),
-                child: TextFormField(
-                  focusNode: pin2FocusNode,
-                  obscureText: true,
-                  style: TextStyle(fontSize: 24),
-                  keyboardType: TextInputType.number,
-                  textAlign: TextAlign.center,
-                  decoration: otpInputDecoration,
-                  onChanged: (value) => nextField(value, pin3FocusNode),
-                ),
+              Stack(
+                alignment: AlignmentDirectional.center,
+                children: [
+                  Container(
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                    ),
+                    width: animation.value > 0  ? animation.value : 0.0 ,
+                    height: animation.value > 0  ? animation.value : 0.0,
+                    child: TextFormField(
+                      inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                      focusNode: pin2FocusNode,
+                      showCursor: false,
+                      style: TextStyle(
+                          fontSize: 32,
+                          color: kPrimaryLightColor,
+                          fontWeight: FontWeight.w900),
+                      keyboardType: TextInputType.number,
+                      textAlign: TextAlign.center,
+                      decoration: otpInputDecoration,
+                      onChanged: (value) {
+                        nextField(value: value,focusNodeNext:  pin3FocusNode,focusNodeBack: pin1FocusNode);
+                      },
+                    ),
+                  ),
+                  Container(
+                    height: animation.value > 0  ? 0.0 : 15.0,
+                    width: animation.value > 0 ? 0.0 : 15.0,
+                    decoration: BoxDecoration(
+                      color: lightColor,
+                      borderRadius: BorderRadius.all(Radius.circular(60)),
+                    ),
+                  ),
+                ],
               ),
-              SizedBox(
-                width: getProportionateScreenWidth(60),
-                child: TextFormField(
-                  focusNode: pin3FocusNode,
-                  obscureText: true,
-                  style: TextStyle(fontSize: 24),
-                  keyboardType: TextInputType.number,
-                  textAlign: TextAlign.center,
-                  decoration: otpInputDecoration,
-                  onChanged: (value) => nextField(value, pin4FocusNode),
-                ),
+              Stack(
+                alignment: AlignmentDirectional.center,
+                children: [
+                  Container(
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                    ),
+                    width: animation.value > 0  ? animation.value : 0.0 ,
+                    height: animation.value > 0  ? animation.value : 0.0,
+                    child: TextFormField(
+                      inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                      focusNode: pin3FocusNode,
+                      showCursor: false,
+                      style: TextStyle(
+                          fontSize: 32,
+                          color: kPrimaryLightColor,
+                          fontWeight: FontWeight.w900),
+                      keyboardType: TextInputType.number,
+                      textAlign: TextAlign.center,
+                      decoration: otpInputDecoration,
+                      onChanged: (value) {
+                        nextField(value: value, focusNodeNext: pin4FocusNode,focusNodeBack: pin3FocusNode);
+                      },
+                    ),
+                  ),
+                  Container(
+                    height: animation.value > 0  ? 0.0 : 15.0,
+                    width: animation.value > 0 ? 0.0 : 15.0,
+                    decoration: BoxDecoration(
+                      color: lightColor,
+                      borderRadius: BorderRadius.all(Radius.circular(60)),
+                    ),
+                  ),
+                ],
               ),
-              SizedBox(
-                width: getProportionateScreenWidth(60),
-                child: TextFormField(
-                  focusNode: pin4FocusNode,
-                  obscureText: true,
-                  style: TextStyle(fontSize: 24),
-                  keyboardType: TextInputType.number,
-                  textAlign: TextAlign.center,
-                  decoration: otpInputDecoration,
-                  onChanged: (value) {
-                    if (value.length == 1) {
-                      pin4FocusNode!.unfocus();
-                      // Then you need to check is the code is correct or not
-                    }
-                  },
-                ),
+              Stack(
+                alignment: AlignmentDirectional.center,
+                children: [
+                  Container(
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                    ),
+                    width:animation.value > 0  ? animation.value : 0.0 ,
+                    height: animation.value > 0  ? animation.value : 0.0,
+                    child: TextFormField(
+                      inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                      focusNode: pin4FocusNode,
+                      showCursor: false,
+                      style: TextStyle(
+                          fontSize: 32,
+                          color: kPrimaryLightColor,
+                          fontWeight: FontWeight.w900),
+                      keyboardType: TextInputType.number,
+                      textAlign: TextAlign.center,
+                      decoration: otpInputDecoration,
+                      onChanged: (value) {
+                        if (value.length == 1) {
+                         // pin4FocusNode!.unfocus();
+                          // Then you need to check is the code is correct or not
+                          // Navigator.of(context).push(MaterialPageRoute(builder: (context) => VerifiedScreen()));
+                        }                      },
+                    ),
+                  ),
+                  Container(
+                    height: animation.value > 0  ? 0.0 : 15.0,
+                    width: animation.value > 0 ? 0.0 : 15.0,
+                    decoration: BoxDecoration(
+                      color: lightColor,
+                      borderRadius: BorderRadius.all(Radius.circular(60)),
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
           SizedBox(height: SizeConfig.screenHeight * 0.15),
-          DefaultButton(
-            text: "Continue",
-            press: () {},
-          )
         ],
       ),
     );
   }
-
 }
-class DefaultButton extends StatelessWidget {
-  const DefaultButton({
-    Key? key,
-    this.text,
-    this.press,
-  }) : super(key: key);
-  final String? text;
-  final Function? press;
 
-  @override
-  Widget build(BuildContext context) {
-    return SizedBox(
-      width: double.infinity,
-      height: getProportionateScreenHeight(56),
-      child: TextButton(
-        style: TextButton.styleFrom(
-          shape:
-          RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-          primary: Colors.white,
-          backgroundColor: Color(0xFFFF7643),
-        ),
-        onPressed: press as void Function()?,
-        child: Text(
-          text!,
-          style: TextStyle(
-            fontSize: getProportionateScreenWidth(18),
-            color: Colors.white,
-          ),
-        ),
-      ),
-    );
-  }
-}

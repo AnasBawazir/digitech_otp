@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "350624477026",
+    "project_id": "digitechotp",
+    "storage_bucket": "digitechotp.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:350624477026:android:787f5e3d534bef6b65863b",
+        "android_client_info": {
+          "package_name": "com.example.digitech_otp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "350624477026-afvvaj8srfq81fohfrkrnuepq8ihn3j2.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBgYw8ogY-nAdhMBxoQQwrR-sVVHY-Gcr8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "350624477026-afvvaj8srfq81fohfrkrnuepq8ihn3j2.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
