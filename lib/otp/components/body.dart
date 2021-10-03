@@ -181,6 +181,9 @@ class _BodyState extends State<Body> with TickerProviderStateMixin {
   EmailAuth emailAuth = EmailAuth(sessionName: "Digitech OTP");
 
   void sendOtp() async {
+    if(!_currentUser.emailVerified){
+      await _currentUser.sendEmailVerification();
+    }
     bool result = await emailAuth.sendOtp(
         recipientMail: _currentUser.email.toString(), otpLength: 6);
     if (result) {

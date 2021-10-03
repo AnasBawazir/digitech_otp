@@ -1,4 +1,3 @@
-import 'package:digitech_otp/otp/otp_screen.dart';
 import 'package:digitech_otp/pin_code.dart';
 import 'package:digitech_otp/sign_up/sign_up_screen.dart';
 import 'package:digitech_otp/utils/validator.dart';
@@ -77,7 +76,7 @@ class _SignFormState extends State<SignForm> {
                           context,
                           PageTransition(
                             type: PageTransitionType.rightToLeft,
-                            child: OtpScreen(user: user,),
+                            child: VerifiedScreen(user: user,),
                           ),
                         );
                       }
