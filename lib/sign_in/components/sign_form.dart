@@ -72,7 +72,7 @@ class _SignFormState extends State<SignForm> {
                       });
 
                       if (user != null) {
-                        Navigator.push(
+                        Navigator.pushReplacement(
                           context,
                           PageTransition(
                             type: PageTransitionType.rightToLeft,

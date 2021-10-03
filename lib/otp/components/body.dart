@@ -167,7 +167,7 @@ class _BodyState extends State<Body> with TickerProviderStateMixin {
 
     if (value.length == 1 && focusNodeNext != null) {
       focusNodeNext.requestFocus();
-    } else if (value.length == 0 && focusNodeBack != null) {
+    }else if (value.length == 0 && focusNodeBack != null) {
       animationControllerBack!.forward();
       animationControllerBack.addStatusListener((status) {
         if (status == AnimationStatus.completed) {
@@ -178,7 +178,16 @@ class _BodyState extends State<Body> with TickerProviderStateMixin {
     }
   }
 
-  EmailAuth emailAuth = EmailAuth(sessionName: "Digitech OTP");
+  void animationsBack({ AnimationController? animationControllerBack}){
+    animationControllerBack!.forward();
+    animationControllerBack.addStatusListener((status) {
+      if (status == AnimationStatus.completed) {
+        animationControllerBack.reverse();
+      }
+    });
+  }
+
+  EmailAuth emailAuth = EmailAuth(sessionName: "Digitech_OTP");
 
   void sendOtp() async {
     if(!_currentUser.emailVerified){
@@ -199,6 +208,7 @@ class _BodyState extends State<Body> with TickerProviderStateMixin {
 
     if (result) {
       print("verified OTP");
+      FocusManager.instance.primaryFocus?.unfocus();
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(
           builder: (context) => VerifiedScreen(user: _currentUser),
@@ -212,7 +222,6 @@ class _BodyState extends State<Body> with TickerProviderStateMixin {
         gravity: ToastGravity.CENTER,
         timeInSecForIosWeb: 5,
       );
-      ;
     }
   }
 
@@ -258,342 +267,405 @@ class _BodyState extends State<Body> with TickerProviderStateMixin {
                   style: headingStyle,
                 ),
                 Form(
-                  child: Column(
-                    children: [
-                      SizedBox(height: SizeConfig.screenHeight * 0.15),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          Stack(
-                            alignment: AlignmentDirectional.center,
-                            children: [
-                              Container(
-                                decoration: BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    color: kPrimaryColor),
-                                width: animation.value,
-                                height: animation.value,
-                                child: TextFormField(
-                                  controller: textEditingController,
-                                  enableInteractiveSelection: false,
-                                  inputFormatters: [
-                                    LengthLimitingTextInputFormatter(1),
-                                    FilteringTextInputFormatter.digitsOnly
-                                  ],
-                                  showCursor: false,
-                                  focusNode: pin1FocusNode,
-                                  autofocus: true,
-                                  style: TextStyle(
-                                      fontSize: 32,
-                                      color: kPrimaryLightColor,
-                                      fontWeight: FontWeight.w900),
-                                  keyboardType: TextInputType.number,
-                                  textAlign: TextAlign.center,
-                                  decoration: otpInputDecoration,
-                                  onChanged: (value) {
-                                    wrongColor = null;
-                                    nextField(
-                                        value: value,
-                                        focusNodeNext: pin2FocusNode,
-                                        animationController:
-                                            animationController);
-                                  },
+                  child:Column(
+                      children: [
+                        SizedBox(height: SizeConfig.screenHeight * 0.15),
+                  GestureDetector(
+                    onTap:() => pin6FocusNode!.requestFocus(),
+                    child:  Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            Stack(
+                              alignment: AlignmentDirectional.center,
+                              children: [
+                                Container(
+                                  decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      color: kPrimaryColor),
+                                  width: animation.value,
+                                  height: animation.value,
+                                  child: RawKeyboardListener(
+                                      focusNode: FocusNode(), // or FocusNode()
+                                      onKey: (event){
+                                        if (event.logicalKey == LogicalKeyboardKey.backspace && textEditingController.text.length == 0) {
+                                          animationsBack(animationControllerBack: animationController);
+                                          FocusScope.of(context).requestFocus(pin1FocusNode);
+                                          currentText = "";
+                                          print('backspace clicked');
+                                        }
+
+                                      },
+                                      child:TextFormField(
+                                        controller: textEditingController,
+                                        enableInteractiveSelection: false,
+                                        inputFormatters: [
+                                          LengthLimitingTextInputFormatter(1),
+                                          FilteringTextInputFormatter.digitsOnly
+                                        ],
+                                        showCursor: false,
+                                        focusNode: pin1FocusNode,
+                                        autofocus: true,
+                                        style: TextStyle(
+                                            fontSize: 32,
+                                            color: kPrimaryLightColor,
+                                            fontWeight: FontWeight.w900),
+                                        keyboardType: TextInputType.number,
+                                        textAlign: TextAlign.center,
+                                        decoration: otpInputDecoration,
+                                        onChanged: (value) {
+                                          wrongColor = null;
+                                          nextField(
+                                              value: value,
+                                              focusNodeNext: pin2FocusNode,
+                                              animationController:
+                                              animationController);
+                                        },
+                                      )),
                                 ),
-                              ),
-                              Container(
-                                height: animation.value > 0 ? 0.0 : smallCircle,
-                                width: animation.value > 0 ? 0.0 : smallCircle,
-                                decoration: BoxDecoration(
-                                  color: wrongColor == null
-                                      ? lightColor
-                                      : wrongColor,
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(60)),
+                                Container(
+                                  height: animation.value > 0 ? 0.0 : smallCircle,
+                                  width: animation.value > 0 ? 0.0 : smallCircle,
+                                  decoration: BoxDecoration(
+                                    color: wrongColor == null
+                                        ? (textEditingController.text.length < 1 ?lightColor:kPrimaryColor)
+                                        : wrongColor,
+                                    borderRadius:
+                                    BorderRadius.all(Radius.circular(60)),
+                                  ),
                                 ),
-                              ),
-                            ],
-                          ),
-                          Stack(
-                            alignment: AlignmentDirectional.center,
-                            children: [
-                              Container(
-                                decoration: BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    color: kPrimaryColor),
-                                width: animation2.value > 0
-                                    ? animation2.value
-                                    : 0.0,
-                                height: animation2.value > 0
-                                    ? animation2.value
-                                    : 0.0,
-                                child: TextFormField(
-                                  controller: textEditingController2,
-                                  enableInteractiveSelection: false,
-                                  inputFormatters: [
-                                    LengthLimitingTextInputFormatter(1),
-                                    FilteringTextInputFormatter.digitsOnly
-                                  ],
-                                  focusNode: pin2FocusNode,
-                                  showCursor: false,
-                                  style: TextStyle(
-                                      fontSize: 32,
-                                      color: kPrimaryLightColor,
-                                      fontWeight: FontWeight.w900),
-                                  keyboardType: TextInputType.number,
-                                  textAlign: TextAlign.center,
-                                  decoration: otpInputDecoration,
-                                  onChanged: (value) {
-                                    nextField(
-                                        value: value,
-                                        focusNodeNext: pin3FocusNode,
-                                        focusNodeBack: pin1FocusNode,
-                                        animationController:
-                                            animationController2,
-                                        animationControllerBack:
-                                            animationController);
-                                  },
+                              ],
+                            ),
+                            Stack(
+                              alignment: AlignmentDirectional.center,
+                              children: [
+                                Container(
+                                  decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      color: kPrimaryColor),
+                                  width: animation2.value > 0
+                                      ? animation2.value
+                                      : 0.0,
+                                  height: animation2.value > 0
+                                      ? animation2.value
+                                      : 0.0,
+                                  child: RawKeyboardListener(
+                                      focusNode: FocusNode(), // or FocusNode()
+                                      onKey: (event){
+                                        if (event.logicalKey == LogicalKeyboardKey.backspace && textEditingController2.text.length == 0) {
+                                          animationsBack(animationControllerBack: animationController);
+                                          FocusScope.of(context).requestFocus(pin1FocusNode);
+                                          print('backspace clicked');
+                                        }
+
+                                      },
+                                      child:TextFormField(
+                                        controller: textEditingController2,
+                                        enableInteractiveSelection: false,
+                                        inputFormatters: [
+                                          LengthLimitingTextInputFormatter(1),
+                                          FilteringTextInputFormatter.digitsOnly
+                                        ],
+                                        focusNode: pin2FocusNode,
+                                        showCursor: false,
+                                        style: TextStyle(
+                                            fontSize: 32,
+                                            color: kPrimaryLightColor,
+                                            fontWeight: FontWeight.w900),
+                                        keyboardType: TextInputType.number,
+                                        textAlign: TextAlign.center,
+                                        decoration: otpInputDecoration,
+                                        onChanged: (value) {
+                                          nextField(
+                                              value: value,
+                                              focusNodeNext: pin3FocusNode,
+                                              focusNodeBack: pin1FocusNode,
+                                              animationController:
+                                              animationController2,
+                                              animationControllerBack:
+                                              animationController);
+                                        },
+                                      )),
                                 ),
-                              ),
-                              Container(
-                                height:
-                                    animation2.value > 0 ? 0.0 : smallCircle,
-                                width: animation2.value > 0 ? 0.0 : smallCircle,
-                                decoration: BoxDecoration(
-                                  color: wrongColor == null
-                                      ? lightColor
-                                      : wrongColor,
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(60)),
+                                Container(
+                                  height:
+                                  animation2.value > 0 ? 0.0 : smallCircle,
+                                  width: animation2.value > 0 ? 0.0 : smallCircle,
+                                  decoration: BoxDecoration(
+                                    color: wrongColor == null
+                                        ? (textEditingController2.text.length < 1 ?lightColor:kPrimaryColor)
+                                        : wrongColor,
+                                    borderRadius:
+                                    BorderRadius.all(Radius.circular(60)),
+                                  ),
                                 ),
-                              ),
-                            ],
-                          ),
-                          Stack(
-                            alignment: AlignmentDirectional.center,
-                            children: [
-                              Container(
-                                decoration: BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    color: kPrimaryColor),
-                                width: animation3.value > 0
-                                    ? animation3.value
-                                    : smallCircle,
-                                height: animation3.value > 0
-                                    ? animation3.value
-                                    : smallCircle,
-                                child: TextFormField(
-                                  controller: textEditingController3,
-                                  enableInteractiveSelection: false,
-                                  inputFormatters: [
-                                    LengthLimitingTextInputFormatter(1),
-                                    FilteringTextInputFormatter.digitsOnly
-                                  ],
-                                  focusNode: pin3FocusNode,
-                                  showCursor: false,
-                                  style: TextStyle(
-                                      fontSize: 32,
-                                      color: kPrimaryLightColor,
-                                      fontWeight: FontWeight.w900),
-                                  keyboardType: TextInputType.number,
-                                  textAlign: TextAlign.center,
-                                  decoration: otpInputDecoration,
-                                  onChanged: (value) {
-                                    nextField(
-                                        value: value,
-                                        focusNodeNext: pin4FocusNode,
-                                        focusNodeBack: pin2FocusNode,
-                                        animationController:
-                                            animationController3,
-                                        animationControllerBack:
-                                            animationController2);
-                                  },
+                              ],
+                            ),
+                            Stack(
+                              alignment: AlignmentDirectional.center,
+                              children: [
+                                Container(
+                                  decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      color: kPrimaryColor),
+                                  width: animation3.value > 0
+                                      ? animation3.value
+                                      : smallCircle,
+                                  height: animation3.value > 0
+                                      ? animation3.value
+                                      : smallCircle,
+                                  child:  RawKeyboardListener(
+                                      focusNode: FocusNode(), // or FocusNode()
+                                      onKey: (event){
+                                        if (event.logicalKey == LogicalKeyboardKey.backspace && textEditingController3.text.length == 0) {
+                                          animationsBack(animationControllerBack: animationController2);
+                                          FocusScope.of(context).requestFocus(pin2FocusNode);
+                                          print('backspace clicked');
+                                        }
+
+                                      },
+                                      child:TextFormField(
+                                        controller: textEditingController3,
+                                        enableInteractiveSelection: false,
+                                        inputFormatters: [
+                                          LengthLimitingTextInputFormatter(1),
+                                          FilteringTextInputFormatter.digitsOnly
+                                        ],
+                                        focusNode: pin3FocusNode,
+                                        showCursor: false,
+                                        style: TextStyle(
+                                            fontSize: 32,
+                                            color: kPrimaryLightColor,
+                                            fontWeight: FontWeight.w900),
+                                        keyboardType: TextInputType.number,
+                                        textAlign: TextAlign.center,
+                                        decoration: otpInputDecoration,
+                                        onChanged: (value) {
+                                          nextField(
+                                              value: value,
+                                              focusNodeNext: pin4FocusNode,
+                                              focusNodeBack: pin2FocusNode,
+                                              animationController:
+                                              animationController3,
+                                              animationControllerBack:
+                                              animationController2);
+                                        },
+                                      )),
                                 ),
-                              ),
-                              Container(
-                                height:
-                                    animation3.value > 0 ? 0.0 : smallCircle,
-                                width: animation3.value > 0 ? 0.0 : smallCircle,
-                                decoration: BoxDecoration(
-                                  color: wrongColor == null
-                                      ? lightColor
-                                      : wrongColor,
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(60)),
+                                Container(
+                                  height:
+                                  animation3.value > 0 ? 0.0 : smallCircle,
+                                  width: animation3.value > 0 ? 0.0 : smallCircle,
+                                  decoration: BoxDecoration(
+                                    color: wrongColor == null
+                                        ? (textEditingController3.text.length < 1 ?lightColor:kPrimaryColor)
+                                        : wrongColor,
+                                    borderRadius:
+                                    BorderRadius.all(Radius.circular(60)),
+                                  ),
                                 ),
-                              ),
-                            ],
-                          ),
-                          Stack(
-                            alignment: AlignmentDirectional.center,
-                            children: [
-                              Container(
-                                decoration: BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    color: kPrimaryColor),
-                                width: animation4.value > 0
-                                    ? animation4.value
-                                    : smallCircle,
-                                height: animation4.value > 0
-                                    ? animation4.value
-                                    : smallCircle,
-                                child: TextFormField(
-                                  controller: textEditingController4,
-                                  enableInteractiveSelection: false,
-                                  inputFormatters: [
-                                    LengthLimitingTextInputFormatter(1),
-                                    FilteringTextInputFormatter.digitsOnly
-                                  ],
-                                  focusNode: pin4FocusNode,
-                                  showCursor: false,
-                                  style: TextStyle(
-                                      fontSize: 32,
-                                      color: kPrimaryLightColor,
-                                      fontWeight: FontWeight.w900),
-                                  keyboardType: TextInputType.number,
-                                  textAlign: TextAlign.center,
-                                  decoration: otpInputDecoration,
-                                  onChanged: (value) {
-                                    nextField(
-                                        value: value,
-                                        focusNodeNext: pin5FocusNode,
-                                        focusNodeBack: pin3FocusNode,
-                                        animationController:
-                                            animationController4,
-                                        animationControllerBack:
-                                            animationController3);
-                                  },
+                              ],
+                            ),
+                            Stack(
+                              alignment: AlignmentDirectional.center,
+                              children: [
+                                Container(
+                                  decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      color: kPrimaryColor),
+                                  width: animation4.value > 0
+                                      ? animation4.value
+                                      : smallCircle,
+                                  height: animation4.value > 0
+                                      ? animation4.value
+                                      : smallCircle,
+                                  child:  RawKeyboardListener(
+                                      focusNode: FocusNode(), // or FocusNode()
+                                      onKey: (event){
+                                        if (event.logicalKey == LogicalKeyboardKey.backspace  && textEditingController4.text.length == 0) {
+                                          animationsBack(animationControllerBack: animationController3);
+                                          FocusScope.of(context).requestFocus(pin3FocusNode);
+                                          print('backspace clicked');
+                                        }
+
+                                      },
+                                      child:TextFormField(
+                                        controller: textEditingController4,
+                                        enableInteractiveSelection: false,
+                                        inputFormatters: [
+                                          LengthLimitingTextInputFormatter(1),
+                                          FilteringTextInputFormatter.digitsOnly
+                                        ],
+                                        focusNode: pin4FocusNode,
+                                        showCursor: false,
+                                        style: TextStyle(
+                                            fontSize: 32,
+                                            color: kPrimaryLightColor,
+                                            fontWeight: FontWeight.w900),
+                                        keyboardType: TextInputType.number,
+                                        textAlign: TextAlign.center,
+                                        decoration: otpInputDecoration,
+                                        onChanged: (value) {
+                                          nextField(
+                                              value: value,
+                                              focusNodeNext: pin5FocusNode,
+                                              focusNodeBack: pin3FocusNode,
+                                              animationController:
+                                              animationController4,
+                                              animationControllerBack:
+                                              animationController3);
+                                        },
+                                      )),
                                 ),
-                              ),
-                              Container(
-                                height:
-                                    animation4.value > 0 ? 0.0 : smallCircle,
-                                width: animation4.value > 0 ? 0.0 : smallCircle,
-                                decoration: BoxDecoration(
-                                  color: wrongColor == null
-                                      ? lightColor
-                                      : wrongColor,
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(60)),
+                                Container(
+                                  height:
+                                  animation4.value > 0 ? 0.0 : smallCircle,
+                                  width: animation4.value > 0 ? 0.0 : smallCircle,
+                                  decoration: BoxDecoration(
+                                    color: wrongColor == null
+                                        ? (textEditingController4.text.length < 1 ?lightColor:kPrimaryColor)
+                                        : wrongColor,
+                                    borderRadius:
+                                    BorderRadius.all(Radius.circular(60)),
+                                  ),
                                 ),
-                              ),
-                            ],
-                          ),
-                          Stack(
-                            alignment: AlignmentDirectional.center,
-                            children: [
-                              Container(
-                                decoration: BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    color: kPrimaryColor),
-                                width: animation5.value > 0
-                                    ? animation5.value
-                                    : smallCircle,
-                                height: animation5.value > 0
-                                    ? animation5.value
-                                    : smallCircle,
-                                child: TextFormField(
-                                  controller: textEditingController5,
-                                  enableInteractiveSelection: false,
-                                  inputFormatters: [
-                                    LengthLimitingTextInputFormatter(1),
-                                    FilteringTextInputFormatter.digitsOnly
-                                  ],
-                                  focusNode: pin5FocusNode,
-                                  showCursor: false,
-                                  style: TextStyle(
-                                      fontSize: 32,
-                                      color: kPrimaryLightColor,
-                                      fontWeight: FontWeight.w900),
-                                  keyboardType: TextInputType.number,
-                                  textAlign: TextAlign.center,
-                                  decoration: otpInputDecoration,
-                                  onChanged: (value) {
-                                    nextField(
-                                        value: value,
-                                        focusNodeNext: pin6FocusNode,
-                                        focusNodeBack: pin4FocusNode,
-                                        animationController:
-                                            animationController5,
-                                        animationControllerBack:
-                                            animationController4);
-                                  },
+                              ],
+                            ),
+                            Stack(
+                              alignment: AlignmentDirectional.center,
+                              children: [
+                                Container(
+                                  decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      color: kPrimaryColor),
+                                  width: animation5.value > 0
+                                      ? animation5.value
+                                      : smallCircle,
+                                  height: animation5.value > 0
+                                      ? animation5.value
+                                      : smallCircle,
+                                  child:  RawKeyboardListener(
+                                      focusNode: FocusNode(), // or FocusNode()
+                                      onKey: (event){
+                                        if (event.logicalKey == LogicalKeyboardKey.backspace && textEditingController5.text.length == 0) {
+                                          animationsBack(animationControllerBack: animationController4);
+                                          FocusScope.of(context).requestFocus(pin4FocusNode);
+                                          print('backspace clicked');
+                                        }
+
+                                      },
+                                      child:TextFormField(
+                                        controller: textEditingController5,
+                                        enableInteractiveSelection: false,
+                                        inputFormatters: [
+                                          LengthLimitingTextInputFormatter(1),
+                                          FilteringTextInputFormatter.digitsOnly
+                                        ],
+                                        focusNode: pin5FocusNode,
+                                        showCursor: false,
+                                        style: TextStyle(
+                                            fontSize: 32,
+                                            color: kPrimaryLightColor,
+                                            fontWeight: FontWeight.w900),
+                                        keyboardType: TextInputType.number,
+                                        textAlign: TextAlign.center,
+                                        decoration: otpInputDecoration,
+                                        onChanged: (value) {
+                                          nextField(
+                                              value: value,
+                                              focusNodeNext: pin6FocusNode,
+                                              focusNodeBack: pin4FocusNode,
+                                              animationController:
+                                              animationController5,
+                                              animationControllerBack:
+                                              animationController4);
+                                        },
+                                      )),
                                 ),
-                              ),
-                              Container(
-                                height:
-                                    animation5.value > 0 ? 0.0 : smallCircle,
-                                width: animation5.value > 0 ? 0.0 : smallCircle,
-                                decoration: BoxDecoration(
-                                  color: wrongColor == null
-                                      ? lightColor
-                                      : wrongColor,
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(60)),
+                                Container(
+                                  height:
+                                  animation5.value > 0 ? 0.0 : smallCircle,
+                                  width: animation5.value > 0 ? 0.0 : smallCircle,
+                                  decoration: BoxDecoration(
+                                    color: wrongColor == null
+                                        ? (textEditingController5.text.length < 1 ?lightColor:kPrimaryColor)
+                                        : wrongColor,
+                                    borderRadius:
+                                    BorderRadius.all(Radius.circular(60)),
+                                  ),
                                 ),
-                              ),
-                            ],
-                          ),
-                          Stack(
-                            alignment: AlignmentDirectional.center,
-                            children: [
-                              Container(
-                                decoration: BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    color: kPrimaryColor),
-                                width: animation6.value > 0
-                                    ? animation6.value
-                                    : smallCircle,
-                                height: animation6.value > 0
-                                    ? animation6.value
-                                    : smallCircle,
-                                child: TextFormField(
-                                  controller: textEditingController6,
-                                  enableInteractiveSelection: false,
-                                  inputFormatters: [
-                                    LengthLimitingTextInputFormatter(1),
-                                    FilteringTextInputFormatter.digitsOnly
-                                  ],
-                                  focusNode: pin6FocusNode,
-                                  showCursor: false,
-                                  style: TextStyle(
-                                      fontSize: 32,
-                                      color: kPrimaryLightColor,
-                                      fontWeight: FontWeight.w900),
-                                  keyboardType: TextInputType.number,
-                                  textAlign: TextAlign.center,
-                                  decoration: otpInputDecoration,
-                                  onChanged: (value) {
-                                    FocusManager.instance.primaryFocus?.unfocus();
-                                    nextField(
-                                        value: value,
-                                        focusNodeBack: pin5FocusNode,
-                                        animationController:
-                                            animationController6,
-                                        animationControllerBack:
-                                            animationController5);
-                                    verifyOTP();
-                                  },
+                              ],
+                            ),
+                            Stack(
+                              alignment: AlignmentDirectional.center,
+                              children: [
+                                Container(
+                                  decoration: BoxDecoration(
+                                      shape: BoxShape.circle,
+                                      color: kPrimaryColor),
+                                  width: animation6.value > 0
+                                      ? animation6.value
+                                      : smallCircle,
+                                  height: animation6.value > 0
+                                      ? animation6.value
+                                      : smallCircle,
+                                  child:  RawKeyboardListener(
+                                      focusNode: FocusNode(), // or FocusNode()
+                                      onKey: (event){
+                                        if (event.logicalKey == LogicalKeyboardKey.backspace && textEditingController6.text.length == 0) {
+                                          animationsBack(animationControllerBack: animationController5);
+                                          FocusScope.of(context).requestFocus(pin5FocusNode);
+                                          print('backspace clicked');
+                                        }
+
+                                      },
+                                      child:TextFormField(
+                                        controller: textEditingController6,
+                                        enableInteractiveSelection: false,
+                                        inputFormatters: [
+                                          LengthLimitingTextInputFormatter(1),
+                                          FilteringTextInputFormatter.digitsOnly
+                                        ],
+                                        focusNode: pin6FocusNode,
+                                        showCursor: false,
+                                        style: TextStyle(
+                                            fontSize: 32,
+                                            color: kPrimaryLightColor,
+                                            fontWeight: FontWeight.w900),
+                                        keyboardType: TextInputType.number,
+                                        textAlign: TextAlign.center,
+                                        decoration: otpInputDecoration,
+                                        onChanged: (value) {
+                                          nextField(
+                                              value: value,
+                                              focusNodeBack: pin5FocusNode,
+                                              animationController:
+                                              animationController6,
+                                              animationControllerBack:
+                                              animationController5);
+                                          verifyOTP();
+                                        },
+                                      )),
                                 ),
-                              ),
-                              Container(
-                                height:
-                                    animation6.value > 0 ? 0.0 : smallCircle,
-                                width: animation6.value > 0 ? 0.0 : smallCircle,
-                                decoration: BoxDecoration(
-                                  color: wrongColor == null
-                                      ? lightColor
-                                      : wrongColor,
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(60)),
+                                Container(
+                                  height:
+                                  animation6.value > 0 ? 0.0 : smallCircle,
+                                  width: animation6.value > 0 ? 0.0 : smallCircle,
+                                  decoration: BoxDecoration(
+                                    color: wrongColor == null
+                                        ? (textEditingController6.text.length < 1 ?lightColor:kPrimaryColor)
+                                        : wrongColor,
+                                    borderRadius:
+                                    BorderRadius.all(Radius.circular(60)),
+                                  ),
                                 ),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                      SizedBox(height: SizeConfig.screenHeight * 0.15),
-                    ],
-                  ),
+                              ],
+                            ),
+                          ],
+                        )),
+                        SizedBox(height: SizeConfig.screenHeight * 0.15),
+                      ],
+                    ),
+
                 ),
                 SizedBox(height: SizeConfig.screenHeight * 0.1),
               ],

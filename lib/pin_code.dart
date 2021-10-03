@@ -58,7 +58,7 @@ class _VerifiedScreenState extends State<VerifiedScreen> {
           setState(() {
             _isSigningOut = false;
           });
-          Navigator.push(
+          Navigator.pushReplacement(
             context,
             PageTransition(
               type: PageTransitionType.topToBottom,

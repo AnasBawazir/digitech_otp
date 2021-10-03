@@ -61,7 +61,7 @@ class _SignUpFormState extends State<SignUpForm> {
 
                 if (user != null) {
                   Navigator.of(context)
-                      .push(MaterialPageRoute(builder: (context) => OtpScreen(user: user,)));
+                      .pushReplacement(MaterialPageRoute(builder: (context) => OtpScreen(user: user,)));
                 }
               }
             }
