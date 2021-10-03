@@ -6,7 +6,6 @@ import 'package:flutter/material.dart';
 import 'package:digitech_otp/components/custom_surfix_icon.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:digitech_otp/screens/profile_page.dart';
 import 'package:page_transition/page_transition.dart';
 import '../../../components/default_button.dart';
 import '../../../size_config.dart';
@@ -35,16 +34,6 @@ class _SignFormState extends State<SignForm> {
     FirebaseApp firebaseApp = await Firebase.initializeApp();
 
     User? user = FirebaseAuth.instance.currentUser;
-
-    if (user!.emailVerified ) {
-      Navigator.push(
-        context,
-        PageTransition(
-          type: PageTransitionType.fade,
-          child: VerifiedScreen(user: user),
-        ),
-      );
-    }
     print("firebase initialize done");
 
     return firebaseApp;
@@ -84,8 +73,13 @@ class _SignFormState extends State<SignForm> {
                       });
 
                       if (user != null) {
-                        Navigator.of(context).push(MaterialPageRoute(
-                            builder: (context) => VerifiedScreen(user: user)));
+                        Navigator.push(
+                          context,
+                          PageTransition(
+                            type: PageTransitionType.rightToLeft,
+                            child: OtpScreen(user: user,),
+                          ),
+                        );
                       }
                     }
                   },
@@ -104,7 +98,7 @@ class _SignFormState extends State<SignForm> {
                       onTap: () => Navigator.push(
                         context,
                         PageTransition(
-                          type: PageTransitionType.scale,
+                          type: PageTransitionType.bottomToTop,
                           child: SignUpScreen(),
                         ),
                       ),

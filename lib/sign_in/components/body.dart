@@ -1,7 +1,5 @@
-import 'package:digitech_otp/sign_up/sign_up_screen.dart';
 import 'package:flutter/material.dart';
 import '../../../size_config.dart';
-import '../../constants.dart';
 import 'sign_form.dart';
 
 class Body extends StatelessWidget {

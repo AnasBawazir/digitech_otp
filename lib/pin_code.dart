@@ -1,12 +1,10 @@
-import 'dart:async';
 import 'package:digitech_otp/sign_in/sign_in_screen.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:pin_code_fields/pin_code_fields.dart';
+import 'package:page_transition/page_transition.dart';
 import './constants/constants.dart';
 import 'constants.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:digitech_otp/screens/login_page.dart';
 class VerifiedScreen extends StatefulWidget {
   @override
   _VerifiedScreenState createState() => _VerifiedScreenState();
@@ -60,11 +58,14 @@ class _VerifiedScreenState extends State<VerifiedScreen> {
           setState(() {
             _isSigningOut = false;
           });
-          Navigator.of(context).pushReplacement(
-            MaterialPageRoute(
-              builder: (context) => SignInScreen(),
+          Navigator.push(
+            context,
+            PageTransition(
+              type: PageTransitionType.topToBottom,
+              child: SignInScreen(),
             ),
           );
+
         },
         child: Padding(
           padding: EdgeInsets.all(20),

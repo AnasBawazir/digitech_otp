@@ -1,6 +1,5 @@
 import 'package:digitech_otp/sign_in/sign_in_screen.dart';
 import 'package:flutter/material.dart';
-import 'package:page_transition/page_transition.dart';
 void main() {
 
   runApp(MyApp());

@@ -22,6 +22,12 @@ class _BodyState extends State<Body> with TickerProviderStateMixin {
   bool _isSigningOut = false;
   late User _currentUser;
   TextEditingController textEditingController = TextEditingController();
+  TextEditingController textEditingController2 = TextEditingController();
+  TextEditingController textEditingController3 = TextEditingController();
+  TextEditingController textEditingController4 = TextEditingController();
+  TextEditingController textEditingController5 = TextEditingController();
+  TextEditingController textEditingController6 = TextEditingController();
+
   String currentText = "";
   final formKey = GlobalKey<FormState>();
   late Animation animation;
@@ -212,6 +218,13 @@ class _BodyState extends State<Body> with TickerProviderStateMixin {
       pin1FocusNode!.requestFocus();
       wrongColor = Colors.red;
       currentText = "";
+      textEditingController.clear();
+      textEditingController2.clear();
+      textEditingController3.clear();
+      textEditingController4.clear();
+      textEditingController5.clear();
+      textEditingController6.clear();
+
     });
   }
 
@@ -258,6 +271,7 @@ class _BodyState extends State<Body> with TickerProviderStateMixin {
                                 width: animation.value,
                                 height: animation.value,
                                 child: TextFormField(
+                                  controller: textEditingController,
                                   enableInteractiveSelection: false,
                                   inputFormatters: [
                                     LengthLimitingTextInputFormatter(1),
@@ -310,6 +324,7 @@ class _BodyState extends State<Body> with TickerProviderStateMixin {
                                     ? animation2.value
                                     : 0.0,
                                 child: TextFormField(
+                                  controller: textEditingController2,
                                   enableInteractiveSelection: false,
                                   inputFormatters: [
                                     LengthLimitingTextInputFormatter(1),
@@ -364,6 +379,7 @@ class _BodyState extends State<Body> with TickerProviderStateMixin {
                                     ? animation3.value
                                     : smallCircle,
                                 child: TextFormField(
+                                  controller: textEditingController3,
                                   enableInteractiveSelection: false,
                                   inputFormatters: [
                                     LengthLimitingTextInputFormatter(1),
@@ -418,6 +434,7 @@ class _BodyState extends State<Body> with TickerProviderStateMixin {
                                     ? animation4.value
                                     : smallCircle,
                                 child: TextFormField(
+                                  controller: textEditingController4,
                                   enableInteractiveSelection: false,
                                   inputFormatters: [
                                     LengthLimitingTextInputFormatter(1),
@@ -472,6 +489,7 @@ class _BodyState extends State<Body> with TickerProviderStateMixin {
                                     ? animation5.value
                                     : smallCircle,
                                 child: TextFormField(
+                                  controller: textEditingController5,
                                   enableInteractiveSelection: false,
                                   inputFormatters: [
                                     LengthLimitingTextInputFormatter(1),
@@ -526,6 +544,7 @@ class _BodyState extends State<Body> with TickerProviderStateMixin {
                                     ? animation6.value
                                     : smallCircle,
                                 child: TextFormField(
+                                  controller: textEditingController6,
                                   enableInteractiveSelection: false,
                                   inputFormatters: [
                                     LengthLimitingTextInputFormatter(1),
@@ -541,6 +560,7 @@ class _BodyState extends State<Body> with TickerProviderStateMixin {
                                   textAlign: TextAlign.center,
                                   decoration: otpInputDecoration,
                                   onChanged: (value) {
+                                    FocusManager.instance.primaryFocus?.unfocus();
                                     nextField(
                                         value: value,
                                         focusNodeBack: pin5FocusNode,
